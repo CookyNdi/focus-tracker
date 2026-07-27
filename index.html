@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FocusTrack — Pelacak Distraksi</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">FT</div>
+      <div class="brand-text">
+        <h1>FocusTrack</h1>
+        <p>pelacak distraksi kerja/belajar</p>
+      </div>
+    </div>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      <span id="headerCount">0 tercatat hari ini</span>
+      <span id="clockText"></span>
+    </div>
+  </header>
+
+  <!-- ============ HERO: gauge + how-it-works ============ -->
+  <div class="hero">
+    <div class="card gauge-card">
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 200 200">
+          <circle class="gauge-track" cx="100" cy="100" r="80"></circle>
+          <circle class="gauge-fill" id="gaugeFill" cx="100" cy="100" r="80"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-number" id="gaugeNumber">0</div>
+          <div class="gauge-caption">distraksi hari ini</div>
+        </div>
+      </div>
+      <div class="gauge-sub" id="gaugeSub">Belum ada distraksi hari ini</div>
+    </div>
+
+    <div class="card">
+      <p class="eyebrow">Otomatis</p>
+      <h2>Pencatatan lewat redirect</h2>
+      <p class="muted-text">Halaman ini otomatis mencatat <b>+1 distraksi</b> setiap kali dibuka dengan parameter <code>source</code> di URL — arahkan redirect sosmed/app kamu ke sini nanti.</p>
+      <div class="code-line">…/index.html<span class="hl">?source=Instagram</span></div>
+      <p class="muted-text" style="margin-bottom:0">Ganti <code>Instagram</code> dengan nama aplikasi apa saja. Setelah tercatat, parameter di URL otomatis dibersihkan supaya refresh tidak menghitung dobel.</p>
+    </div>
+  </div>
+
+  <!-- ============ STAT STRIP ============ -->
+  <div class="stat-strip">
+    <div class="stat-chip">
+      <div class="stat-value" id="statWeek">0</div>
+      <div class="stat-label">distraksi · 7 hari terakhir</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-value" id="statMonth">0</div>
+      <div class="stat-label">distraksi · 30 hari terakhir</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-value" id="statAvg">0</div>
+      <div class="stat-label">rata-rata per hari (30 hari)</div>
+    </div>
+  </div>
+
+  <!-- ============ CHARTS ============ -->
+  <div class="card chart-card">
+    <div class="chart-head">
+      <h2>Statistik distraksi</h2>
+      <div class="tabs" id="periodTabs">
+        <button class="tab-btn active" data-period="day">Harian</button>
+        <button class="tab-btn" data-period="week">Mingguan</button>
+        <button class="tab-btn" data-period="month">Bulanan</button>
+      </div>
+    </div>
+
+    <div class="chart-block">
+      <p class="chart-block-title">Distraksi per aplikasi</p>
+      <div class="chart-container"><canvas id="appChart"></canvas></div>
+    </div>
+    <div class="chart-block">
+      <p class="chart-block-title">Tren dari waktu ke waktu</p>
+      <div class="chart-container"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ============ HISTORY ============ -->
+  <div class="card history-card">
+    <div class="history-head">
+      <h2>Riwayat</h2>
+      <input type="text" class="search-input" id="historySearch" placeholder="Cari aplikasi…">
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <!-- ============ DATA: export / import / reset ============ -->
+  <details class="settings-card">
+    <summary>Data (export / import / reset) <span class="chevron">▾</span></summary>
+    <div class="settings-body">
+      <p class="muted-text">Export untuk backup, import untuk menggabungkan data dari perangkat lain (data lama tidak akan tertimpa/duplikat).</p>
+      <div class="data-actions">
+        <button class="btn btn-ghost" id="exportBtn">Export JSON</button>
+        <button class="btn btn-ghost" id="importBtn">Import JSON</button>
+        <input type="file" id="importInput" accept="application/json">
+        <button class="btn btn-danger" id="resetBtn">Hapus semua data</button>
+      </div>
+    </div>
+  </details>
+
+  <footer class="foot">Semua data disimpan lokal di browser kamu — tidak dikirim ke server manapun.</footer>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Chart.js (only external script dependency) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
