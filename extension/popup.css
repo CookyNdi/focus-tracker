@@ -80,6 +80,10 @@ header.top{ display:flex; align-items:center; padding-bottom:12px; }
 /* ---------- Generic bits ---------- */
 .muted-text{ font-size:11.5px; color:var(--text-faint); margin:0 0 10px; }
 .muted-text.no-margin{ margin:0; }
+code{
+  background:var(--surface-2); padding:1px 5px; border-radius:4px;
+  font-family:var(--font-mono); font-size:10.5px; color:var(--purple-300);
+}
 .field-label{
   display:block; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase;
   letter-spacing:0.06em; color:var(--text-lo); margin:0 0 5px;

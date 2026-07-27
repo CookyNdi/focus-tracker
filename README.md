@@ -31,6 +31,10 @@ automatically as a new distraction entry.
   and pick the days. When the restriction is **on**, redirects only
   happen while the current time falls inside the chosen hours & days.
   When it's **off**, the sites above are always redirected, any time.
+- **Redirect tab** — set the destination URL that matched sites get sent
+  to (defaults to `https://example.com`). The site's name is added
+  automatically as `?source=`. Use **Reset to default** to go back to
+  `https://example.com`.
 - **History tab** — a local log (kept in the extension, separate from
   FocusTrack's own data) of which site was redirected and when. Can be
   cleared any time.
@@ -40,17 +44,15 @@ pre-filled on first install — feel free to edit or delete them as needed.
 
 ## Changing the redirect destination
 
-The redirect base URL is currently set to `https://example.com` as
-requested. To change it (e.g. once FocusTrack is hosted at its real
-domain), edit this single line in `background.js`:
-
-```js
-const REDIRECT_BASE_URL = "https://example.com";
-```
+No code editing needed — open the popup's **Redirect** tab, type the new
+URL (e.g. once FocusTrack is hosted at its real domain), and click
+**Save**. It's stored in `chrome.storage.local` and used immediately for
+the next matching navigation. `https://example.com` is only the built-in
+default used the very first time the extension runs.
 
 ## Technical notes
 
-- All data (`sites`, `workHours`, `history`) is stored in
+- All data (`sites`, `workHours`, `redirectUrl`, `history`) is stored in
   `chrome.storage.local` — local to the browser, never sent to any
   server.
 - The extension requests broad host permissions (`http://*/*`,
@@ -61,23 +63,23 @@ const REDIRECT_BASE_URL = "https://example.com";
 - Navigation detection uses `chrome.webNavigation.onBeforeNavigate` and
   only processes the main frame (not iframes), so it won't accidentally
   redirect third-party iframes embedded inside other pages.
-- Redirects to FocusTrack's own domain (`REDIRECT_BASE_URL`) are
+- Redirects to FocusTrack's own domain (the configured Redirect URL) are
   automatically skipped to avoid a redirect loop.
 
 ## File structure
 
 ```
-focustrack-extension/
-├── manifest.json     # extension configuration (Manifest V3)
-├── background.js     # service worker: navigation detection + redirect + log
-├── utils.js          # shared helper functions (used by background & popup)
-├── popup.html
-├── popup.css
-├── popup.js           # UI: manage sites, work hours, history
-├── icons/
-│   ├── icon16.png
-│   ├── icon32.png
-│   ├── icon48.png
-│   └── icon128.png
+repo/
+├── extension/
+│   ├── icons/icon128.png (dst.)
+│   ├── background.js
+│   ├── manifest.json
+│   ├── popup.css / popup.html / popup.js
+│   └── utils.js
+├── website/
+│   ├── app.js
+│   ├── index.html
+│   └── styles.css
+├── LICENSE
 └── README.md
 ```

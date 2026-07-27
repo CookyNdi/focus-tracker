@@ -32,6 +32,10 @@ const dom = {
   daysRow: document.getElementById("daysRow"),
   saveHoursBtn: document.getElementById("saveHoursBtn"),
 
+  redirectUrlInput: document.getElementById("redirectUrlInput"),
+  saveRedirectUrlBtn: document.getElementById("saveRedirectUrlBtn"),
+  resetRedirectUrlBtn: document.getElementById("resetRedirectUrlBtn"),
+
   historyList: document.getElementById("historyList"),
   clearHistoryBtn: document.getElementById("clearHistoryBtn"),
 
@@ -55,6 +59,7 @@ const DAYS = [
 const state = {
   sites: [],
   workHours: { enabled: true, start: "09:00", end: "17:00", days: [1, 2, 3, 4, 5] },
+  redirectUrl: DEFAULT_REDIRECT_URL,
   history: [],
   editingId: null,
   selectedDays: new Set([1, 2, 3, 4, 5]),
@@ -65,9 +70,10 @@ const state = {
    ========================================================= */
 
 async function loadAll() {
-  const data = await chrome.storage.local.get(["sites", "workHours", "history"]);
+  const data = await chrome.storage.local.get(["sites", "workHours", "redirectUrl", "history"]);
   state.sites = data.sites || [];
   state.workHours = data.workHours || state.workHours;
+  state.redirectUrl = data.redirectUrl || DEFAULT_REDIRECT_URL;
   state.history = data.history || [];
   state.selectedDays = new Set(state.workHours.days || []);
 }
@@ -78,6 +84,10 @@ async function persistSites() {
 
 async function persistWorkHours() {
   await chrome.storage.local.set({ workHours: state.workHours });
+}
+
+async function persistRedirectUrl() {
+  await chrome.storage.local.set({ redirectUrl: state.redirectUrl });
 }
 
 async function persistClearHistory() {
@@ -284,7 +294,35 @@ dom.saveHoursBtn.addEventListener("click", async () => {
 });
 
 /* =========================================================
-   8. HISTORY
+   8. REDIRECT URL SETTING
+   ========================================================= */
+
+function renderRedirectUrl() {
+  dom.redirectUrlInput.value = state.redirectUrl;
+}
+
+dom.saveRedirectUrlBtn.addEventListener("click", async () => {
+  const normalized = normalizeRedirectUrl(dom.redirectUrlInput.value);
+  if (!normalized) {
+    showToast("Enter a valid http(s) URL", true);
+    return;
+  }
+
+  state.redirectUrl = normalized;
+  dom.redirectUrlInput.value = normalized;
+  await persistRedirectUrl();
+  showToast("Redirect URL saved");
+});
+
+dom.resetRedirectUrlBtn.addEventListener("click", async () => {
+  state.redirectUrl = DEFAULT_REDIRECT_URL;
+  renderRedirectUrl();
+  await persistRedirectUrl();
+  showToast("Reset to default");
+});
+
+/* =========================================================
+   9. HISTORY
    ========================================================= */
 
 function renderHistory() {
@@ -331,13 +369,14 @@ dom.clearHistoryBtn.addEventListener("click", async () => {
 });
 
 /* =========================================================
-   9. BOOT
+   10. BOOT
    ========================================================= */
 
 async function init() {
   await loadAll();
   renderSites();
   renderWorkHours();
+  renderRedirectUrl();
   renderHistory();
 }
 

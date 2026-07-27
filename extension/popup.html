@@ -24,7 +24,8 @@
 
   <nav class="tabs" id="tabs">
     <button class="tab-btn active" data-tab="sites" type="button">Sites</button>
-    <button class="tab-btn" data-tab="hours" type="button">Work Hours</button>
+    <button class="tab-btn" data-tab="hours" type="button">Hours</button>
+    <button class="tab-btn" data-tab="settings" type="button">Redirect</button>
     <button class="tab-btn" data-tab="history" type="button">History</button>
   </nav>
 
@@ -80,6 +81,19 @@
     </div>
 
     <button class="btn btn-primary btn-sm btn-block" id="saveHoursBtn" type="button">Save work hours</button>
+  </section>
+
+  <!-- ============ TAB: REDIRECT SETTINGS ============ -->
+  <section class="tab-panel" id="panel-settings">
+    <p class="muted-text">Where matched sites get redirected to. The site name is added automatically as <code>?source=</code>.</p>
+
+    <label class="field-label" for="redirectUrlInput">Redirect URL</label>
+    <input type="text" id="redirectUrlInput" placeholder="https://example.com" autocomplete="off">
+
+    <div class="form-actions">
+      <button class="btn btn-ghost btn-sm" id="resetRedirectUrlBtn" type="button">Reset to default</button>
+      <button class="btn btn-primary btn-sm" id="saveRedirectUrlBtn" type="button">Save</button>
+    </div>
   </section>
 
   <!-- ============ TAB: HISTORY ============ -->

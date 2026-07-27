@@ -9,6 +9,46 @@
 
 "use strict";
 
+/** Fallback redirect destination used until the user sets their own in the popup. */
+const DEFAULT_REDIRECT_URL = "https://example.com";
+
+/**
+ * Validates and normalizes a redirect URL entered by the user.
+ * Adds an "https://" prefix if no scheme was given, and rejects
+ * anything that isn't a valid http/https URL.
+ * Returns the normalized URL string, or null if invalid.
+ */
+function normalizeRedirectUrl(input) {
+  const raw = String(input || "").trim();
+  if (!raw) return null;
+
+  const withProtocol = raw.includes("://") ? raw : `https://${raw}`;
+  try {
+    const url = new URL(withProtocol);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Builds the final redirect URL by adding/overwriting a "source"
+ * query parameter on top of the configured base URL, however that
+ * base URL is shaped (with or without a path or existing query string).
+ */
+function buildRedirectUrl(baseUrl, sourceName) {
+  try {
+    const url = new URL(baseUrl);
+    url.searchParams.set("source", sourceName);
+    return url.toString();
+  } catch {
+    // Fallback for the rare case baseUrl isn't parseable as a URL.
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    return `${baseUrl}${separator}source=${encodeURIComponent(sourceName)}`;
+  }
+}
+
 /**
  * Normalizes user input (a full URL or just a domain name)
  * into a clean hostname without "www.".

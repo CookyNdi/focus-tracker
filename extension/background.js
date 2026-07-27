@@ -26,11 +26,12 @@ importScripts("utils.js");
    1. CONSTANTS
    ========================================================= */
 
-// Destination FocusTrack URL for the redirect. Change this later
-// (e.g. once FocusTrack is hosted at its real domain).
-const REDIRECT_BASE_URL = "https://example.com";
+const HISTORY_LIMIT = 10;
 
-const HISTORY_LIMIT = 50;
+// The redirect destination is normally read from chrome.storage.local
+// (set via the popup's Settings tab). DEFAULT_REDIRECT_URL (from utils.js)
+// is only used to seed storage on first install, or as a fallback if
+// storage somehow ends up empty.
 
 // Seed data so the extension isn't empty right after install.
 // All of this can be edited or removed from the popup.
@@ -60,6 +61,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   if (!existing.sites) toSet.sites = DEFAULT_SITES;
   if (!existing.workHours) toSet.workHours = DEFAULT_WORK_HOURS;
   if (!existing.history) toSet.history = [];
+  if (!existing.redirectUrl) toSet.redirectUrl = DEFAULT_REDIRECT_URL;
 
   if (Object.keys(toSet).length > 0) {
     await chrome.storage.local.set(toSet);
@@ -102,17 +104,23 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
   // Only handle http/https (skip chrome://, file://, etc).
   if (targetUrl.protocol !== "http:" && targetUrl.protocol !== "https:") return;
 
+  const { sites = [], workHours, redirectUrl } = await chrome.storage.local.get([
+    "sites",
+    "workHours",
+    "redirectUrl",
+  ]);
+  const baseUrl = redirectUrl || DEFAULT_REDIRECT_URL;
+
   // Never redirect the FocusTrack page itself (avoid a redirect loop).
-  let redirectHost = "";
+  let baseHost = "";
   try {
-    redirectHost = new URL(REDIRECT_BASE_URL).hostname.replace(/^www\./, "");
+    baseHost = new URL(baseUrl).hostname.replace(/^www\./, "");
   } catch {
-    redirectHost = "";
+    baseHost = "";
   }
   const currentHost = targetUrl.hostname.replace(/^www\./, "");
-  if (redirectHost && currentHost === redirectHost) return;
+  if (baseHost && currentHost === baseHost) return;
 
-  const { sites = [], workHours } = await chrome.storage.local.get(["sites", "workHours"]);
   if (sites.length === 0) return;
 
   const match = findMatchingSite(targetUrl.hostname, sites);
@@ -125,9 +133,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 
   await logRedirect(match, details.url);
 
-  const redirectUrl = `${REDIRECT_BASE_URL}?source=${encodeURIComponent(match.name)}`;
+  const finalUrl = buildRedirectUrl(baseUrl, match.name);
   try {
-    await chrome.tabs.update(details.tabId, { url: redirectUrl });
+    await chrome.tabs.update(details.tabId, { url: finalUrl });
   } catch {
     // The tab may have closed/navigated away before the redirect could run — ignore.
   }
