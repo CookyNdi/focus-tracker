@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FocusTrack Redirector</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">FT</div>
+      <div class="brand-text">
+        <h1>FocusTrack</h1>
+        <p>distraction redirector</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="sites" type="button">Sites</button>
+    <button class="tab-btn" data-tab="hours" type="button">Work Hours</button>
+    <button class="tab-btn" data-tab="history" type="button">History</button>
+  </nav>
+
+  <!-- ============ TAB: SITES ============ -->
+  <section class="tab-panel active" id="panel-sites">
+    <div class="panel-head">
+      <p class="muted-text">Opened during work hours → redirected to FocusTrack.</p>
+      <button class="btn btn-primary btn-sm" id="addSiteBtn" type="button">+ Add</button>
+    </div>
+
+    <div class="site-list" id="siteList"></div>
+
+    <div class="site-form hidden" id="siteForm">
+      <p class="form-title" id="formTitle">Add site</p>
+      <label class="field-label" for="siteName">Name</label>
+      <input type="text" id="siteName" placeholder="e.g. Instagram" autocomplete="off">
+      <label class="field-label" for="sitePattern">Domain or URL</label>
+      <input type="text" id="sitePattern" placeholder="e.g. instagram.com" autocomplete="off">
+      <div class="form-actions">
+        <button class="btn btn-ghost btn-sm" id="cancelSiteBtn" type="button">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="saveSiteBtn" type="button">Save</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: WORK HOURS ============ -->
+  <section class="tab-panel" id="panel-hours">
+    <div class="hours-toggle-row">
+      <div>
+        <p class="field-label no-margin">Restrict to work hours only</p>
+        <p class="muted-text no-margin">When off, the sites above are always redirected, any time.</p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="hoursEnabled">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="hours-fields" id="hoursFields">
+      <div class="time-row">
+        <label class="time-field">
+          <span class="field-label">Start</span>
+          <input type="time" id="hoursStart">
+        </label>
+        <label class="time-field">
+          <span class="field-label">End</span>
+          <input type="time" id="hoursEnd">
+        </label>
+      </div>
+
+      <span class="field-label">Work days</span>
+      <div class="days-row" id="daysRow"></div>
+    </div>
+
+    <button class="btn btn-primary btn-sm btn-block" id="saveHoursBtn" type="button">Save work hours</button>
+  </section>
+
+  <!-- ============ TAB: HISTORY ============ -->
+  <section class="tab-panel" id="panel-history">
+    <div class="panel-head">
+      <p class="muted-text">Local log of every redirect that happened.</p>
+      <button class="btn btn-ghost btn-sm" id="clearHistoryBtn" type="button">Clear</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </section>
+
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="utils.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
